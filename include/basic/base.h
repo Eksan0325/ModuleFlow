@@ -17,6 +17,10 @@
 
 #include <vector>
 #include <list>
+#include <map>
+#include <unordered_map>
+#include <ostream>
+#include <cstdlib>
 
 #define MFLOW_PRIVATE_DECLARE(type, name) \
 	private: \
@@ -43,7 +47,7 @@ public: \
 using __VA_ARGS__::CONSTRUCTOR; \
 CLASS() : __VA_ARGS__() {} \
 CLASS(const __VA_ARGS__& other) noexcept : __VA_ARGS__(other) {} \
-CLASS(__VA_ARGS__&& other) noexcept : __VA_ARGS__(std::move(other)) {} 
+CLASS(__VA_ARGS__&& other) noexcept : __VA_ARGS__(std::move(other)) {}
 
 namespace mflow {
 namespace meta {
@@ -94,15 +98,17 @@ struct _t_contains<T0, T1, T...> : std::integral_constant<bool, std::is_same<T0,
 * to get the return type and argument types of a function.
 */
 
-template<typename T> static decltype(&T::operator()) _t_functional(int) {
-	return &T::operator();
-}
-template<typename T> static void _t_functional(short){}
+template<typename T> static decltype(&T::operator()) _t_functional(int) { return &T::operator(); }
+template<typename T> static void _t_functional(short) {}
+
+template<typename Func>
+struct FuncInfo;
+
+template<>
+struct FuncInfo<void> { enum { isFunction = false }; };
 
 template<typename Func>
 struct FuncInfo : public FuncInfo<decltype(_t_functional<Func>(0))> {};
-template<typename Func = void>
-struct FuncInfo { enum { isFunction = false}; };
 
 template<typename Result, typename... Args>
 struct FuncInfo<Result(*)(Args...)> {
@@ -170,10 +176,10 @@ protected:
 	inline DerivedT* dptr() { return static_cast<DerivedT*>(this); }
 public:
 	template<typename Foreach> DerivedT& foreach(Foreach&& func) {
-		auto* _dptr = dptr(); std::for_each(_dptr->begin(), _dptr()->end(), std::forward<Foreach>(func)); return *_dptr;
+		auto* _dptr = dptr(); std::for_each(_dptr->begin(), _dptr->end(), std::forward<Foreach>(func)); return *_dptr;
 	}
 	template<typename Foreach> const DerivedT& foreach(Foreach&& func) const {
-		auto* _dptr = dptr(); std::for_each(_dptr->cbegin(), _dptr()->cend(), std::forward<Foreach>(func)); return *_dptr;
+		auto* _dptr = dptr(); std::for_each(_dptr->cbegin(), _dptr->cend(), std::forward<Foreach>(func)); return *_dptr;
 	}
 	int size() const { return static_cast<int>(dptr()->size()); }
 	bool has(int index) const { return index >= 0 && index < this->size(); }
@@ -196,10 +202,10 @@ public:
 };
 
 template<typename T> class Vector : public std::vector<T>, public PrivateTContainerBase<Vector<T>, T> {
-	MFLOW_INHERIT_CONSTRUCTORS_IMPL(vector, Vector<T>, std::vector<T>)
+	MFLOW_INHERIT_CONSTRUCTORS_IMPL(vector, Vector, std::vector<T>)
 };
-template<typename T> class List : public std::list<T>, public PrivateTContainerBase<Vector<T>, T> {
-	MFLOW_INHERIT_CONSTRUCTORS_IMPL(list, List<T>, std::list<T>)
+template<typename T> class List : public std::list<T>, public PrivateTContainerBase<List<T>, T> {
+	MFLOW_INHERIT_CONSTRUCTORS_IMPL(list, List, std::list<T>)
 };
 
 template<typename DerivedT, typename KeyT, typename ValueT>
@@ -243,15 +249,17 @@ public:
 
 template<typename K, typename V>
 class Map : public std::map<K, V>, public PrivateKVContainerBase<Map<K, V>, K, V> {
-	MFLOW_INHERIT_CONSTRUCTORS_IMPL(map, Map<K, V>, std::map<K, V>)
+	MFLOW_INHERIT_CONSTRUCTORS_IMPL(map, Map, std::map<K, V>)
 	Map(const Vector<K>& keys, const Vector<V>& values) : std::map<K, V>() { this->fromMultiKV(keys, values); }
 };
 
 template<typename K, typename V>
 class HashMap : public std::unordered_map<K, V>, public PrivateKVContainerBase<HashMap<K, V>, K, V> {
-	MFLOW_INHERIT_CONSTRUCTORS_IMPL(unordered_map, HashMap<K, V>, std::unordered_map<K, V>)
+	MFLOW_INHERIT_CONSTRUCTORS_IMPL(unordered_map, HashMap, std::unordered_map<K, V>)
 	HashMap(const Vector<K>& keys, const Vector<V>& values) : std::unordered_map<K, V>() { this->fromMultiKV(keys, values); }
 };
+
+}
 
 }
 
