@@ -7,7 +7,7 @@
 #define MFLOW_BASIC_OBJECT_H
 
 #include "basic/base.h"
-
+#define MFLOW_UNDEFINED_OBJECT_NAME "@undefined"
 namespace mflow {
 
 /**
@@ -35,12 +35,12 @@ public:
 
 	enum Signal : int { DELETE = 0x00ff };
 	
-	bool hasConnection(Signal signal, Object* observer);
-	void connect(Signal signal, Object* observer, const Task& action);
-	void disconnect(Signal signal, Object* observer);
+	bool hasConnection(int signal, Object* observer);
+	void connect(int signal, Object* observer, const Task& action);
+	void disconnect(int signal, Object* observer);
 	void disconnect(Object* observer);
 
-	void emit(Signal signal);
+	void emit(int signal);
 private:
 	friend class ObjectManager;
 };

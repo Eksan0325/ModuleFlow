@@ -14,7 +14,7 @@ class Object::PrivateImpl {
 public:
 	std::string name_;
 	Object* parent_ = nullptr;
-	container::HashMap<Object::Signal, container::HashMap<Object*, container::List<Task>>> connections_;
+	container::HashMap<int, container::HashMap<Object*, container::List<Task>>> connections_;
 };
 
 Object::Object(const std::string& name) : pimpl_(new PrivateImpl) {
@@ -31,10 +31,10 @@ Object* Object::parent() const { return pimpl_->parent_; }
 void Object::setParent(Object* p) { pimpl_->parent_ = p; }
 std::string Object::name() const { return pimpl_->name_; }
 
-bool Object::hasConnection(Signal signal, Object* observer) {
+bool Object::hasConnection(int signal, Object* observer) {
 	return pimpl_->connections_.has(signal) && pimpl_->connections_[signal].has(observer);
 }
-void Object::connect(Signal signal, Object* observer, const Task& action) {
+void Object::connect(int signal, Object* observer, const Task& action) {
 	if (!pimpl_->connections_.has(signal)) {
 		pimpl_->connections_[signal] = { {observer, {action}} };
 	} else if (!pimpl_->connections_[signal].has(observer)) {
@@ -48,13 +48,13 @@ void Object::connect(Signal signal, Object* observer, const Task& action) {
 	}
 }
 
-void Object::disconnect(Signal signal, Object* observer) {
+void Object::disconnect(int signal, Object* observer) {
 	if (pimpl_->connections_.has(signal)) pimpl_->connections_[signal].erase(observer);
 }
 void Object::disconnect(Object* observer) {
 	for (auto& kv : pimpl_->connections_) kv.second.erase(observer);
 }
-void Object::emit(Signal signal) {
+void Object::emit(int signal) {
 	if (!pimpl_->connections_.has(signal)) return;
 	auto _observer_map_copy = pimpl_->connections_[signal]; //task maybe will call disconnect, needed to use copy
 	for (auto& kv : _observer_map_copy) {
