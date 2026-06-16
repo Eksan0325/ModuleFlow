@@ -140,7 +140,7 @@ struct FuncInfo<Result(Class::*)(Args...) const> {
 template<typename T>
 using _t_remove_rc = typename std::remove_const<typename std::remove_reference<T>::type>::type;
 
-std::string _t_demangle(const char* name) {
+inline std::string _t_demangle(const char* name) {
 	int status = -4; std::string _result = "";
 	char* _demangled = abi::__cxa_demangle(name, NULL, NULL, &status);
 	if (status != 0 || _demangled == nullptr) _result = name; else _result = _demangled;
@@ -209,7 +209,7 @@ public:
 	template<typename Foreach> const DerivedT& foreach(Foreach&& func) const {
 		auto* _dptr = dptr(); std::for_each(_dptr->cbegin(), _dptr->cend(), std::forward<Foreach>(func)); return *_dptr;
 	}
-	int size() const { return static_cast<int>(dptr()->size()); }
+	int sizeInt() const { return static_cast<int>(dptr()->size()); }
 	bool has(int index) const { return index >= 0 && index < this->size(); }
 	ValueT value(int index, const ValueT& default_value) const { 
 		return this->has(index) ? dptr()->operator[](index) : default_value; }
@@ -250,7 +250,7 @@ protected:
 	}
 
 public:
-	int size() const { return static_cast<int>(dptr()->size()); }
+	int sizeInt() const { return static_cast<int>(dptr()->size()); }
 	bool has(const KeyT& key) const { return dptr()->find(key) != dptr()->end(); }
 
 	Vector<KeyT> kyes() const {

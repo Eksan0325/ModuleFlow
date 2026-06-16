@@ -6,7 +6,7 @@
 
 #include "basic/object.h"
 
-#define MFLOW_UNDEFINED_OBJECT_NAME "@undefined"
+
 
 namespace mflow {
 
