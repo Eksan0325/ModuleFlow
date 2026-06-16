@@ -30,8 +30,7 @@ file(GLOB_RECURSE SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
 )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/include)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/lib)
+include(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/JsoncppConfig.cmake)
 
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
@@ -40,6 +39,7 @@ add_library(mflow_obj OBJECT ${SRC_FILES})
 
 target_include_directories(mflow_obj PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    ${Jsoncpp_INCLUDE_DIRS}
 )
 
 target_include_directories(mflow_obj PUBLIC
@@ -66,6 +66,7 @@ target_include_directories(mflow_shared PUBLIC
     "$<INSTALL_INTERFACE:include>"
 )
 
+target_link_libraries(mflow_shared PRIVATE ${Jsoncpp_LIBS})
 
 add_library(mflow_static STATIC $<TARGET_OBJECTS:mflow_obj>)
 
@@ -77,6 +78,8 @@ target_include_directories(mflow_static PUBLIC
     "$<BUILD_INTERFACE:${INCLUDE_DIR}>"
     "$<INSTALL_INTERFACE:include>"
 )
+
+target_link_libraries(mflow_static PRIVATE ${Jsoncpp_LIBS})
 
 install(TARGETS mflow_shared mflow_static
     LIBRARY DESTINATION lib      
