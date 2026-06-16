@@ -159,11 +159,37 @@ template<typename F1, typename F2, typename Type>
 using FuncIfConvertible = typename std::enable_if<std::is_convertible<F1, F2>::value && std::is_constructible<typename FuncInfo<F2>::FuncType, F1>::value, Type>::type;
 }
 namespace atomic {
-template<typename T>
-class AtomicData {
+template<typename T> class AtomicData {
 private:
 	using Type = mflow::meta::_t_remove_rc<T>;
+public:
+	AtomicData() : data_() {}
+	AtomicData(const Type& D) : data_(D) {}
+	AtomicData(Type&& D) : data_(std::move(D)) {}
+	AtomicData(const AtomicData& other) { data_ = other.data_.load(); }
+
+	inline Type AtomicDataLoad() const { return data_.load(); }
+	inline void AtomicDataStore(const Type& D) { data_ = (D); }
+private:
 	std::atomic<Type> data_;
+};
+
+template<typename T> class MutexData {
+private:
+	using Type = mflow::meta::_t_remove_rc<T>;
+	using Lock = std::lock_guard<std::mutex>;
+public:
+	MutexData() : data_() {}
+	MutexData(const Type& D) : data_(D) {}
+	MutexData(Type&& D) : data_(std::move(D)) {}
+	MutexData(const MutexData& other) { Lock _(mtx_); data_ = other.data_; }
+
+	inline Type MutexDataLoad() const { Lock _(mtx_); return data_; }
+	inline void MutexDataStore(const Type& D) { Lock _(mtx_); data_ = (D); }
+
+private:
+	Type data_;
+	std::mutex mtx_;
 };
 }
 namespace container {
