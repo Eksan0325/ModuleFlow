@@ -210,14 +210,16 @@ public:
 		auto* _dptr = dptr(); std::for_each(_dptr->cbegin(), _dptr->cend(), std::forward<Foreach>(func)); return *_dptr;
 	}
 	int sizeInt() const { return static_cast<int>(dptr()->size()); }
-	bool has(int index) const { return index >= 0 && index < this->size(); }
-	ValueT value(int index, const ValueT& default_value) const { 
+	bool has(int index) const { return index >= 0 && index < this->sizeInt(); }
+	ValueT value(int index) const {
+		return this->has(index) ? dptr()->operator[](index) : ValueT(); }
+	const ValueT& value(int index, const ValueT& default_value) const { 
 		return this->has(index) ? dptr()->operator[](index) : default_value; }
 	const ValueT& valueref(int index, const ValueT& default_value) const { 
 		return this->has(index) ? dptr()->operator[](index) : default_value; }
-	DerivedT& insert(int index, const ValueT& value) {
+	DerivedT& insertOne(int index, const ValueT& value) {
 		auto* _dptr = dptr(); _dptr->insert(_dptr->begin() + index, value); return *_dptr; }
-	DerivedT& insert(int index, ValueT&& value) {
+	DerivedT& insertOne(int index, ValueT&& value) {
 		auto* _dptr = dptr(); _dptr->insert(_dptr->begin() + index, std::move(value)); return *_dptr; }
 	DerivedT& prepend(const ValueT& value) {
 		auto* _dptr = dptr(); _dptr->insert(_dptr->begin(), value); return *_dptr; }
