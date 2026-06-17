@@ -51,41 +51,15 @@ set_target_properties(mflow_obj PROPERTIES
     POSITION_INDEPENDENT_CODE ON
 )
 
-
-add_library(mflow_shared SHARED $<TARGET_OBJECTS:mflow_obj>)
-
-
-set_target_properties(mflow_shared PROPERTIES
-    OUTPUT_NAME mflow
-    VERSION     ${PROJECT_VERSION} 
-    SOVERSION   ${PROJECT_VERSION_MAJOR}
-)
-
-target_include_directories(mflow_shared PUBLIC
-    "$<BUILD_INTERFACE:${INCLUDE_DIR}>"
-    "$<INSTALL_INTERFACE:include>"
-)
-
-target_link_libraries(mflow_shared PRIVATE ${Jsoncpp_LIBS})
-
 add_library(mflow_static STATIC $<TARGET_OBJECTS:mflow_obj>)
-
 set_target_properties(mflow_static PROPERTIES
     OUTPUT_NAME mflow_static       
 )
-
 target_include_directories(mflow_static PUBLIC
     "$<BUILD_INTERFACE:${INCLUDE_DIR}>"
     "$<INSTALL_INTERFACE:include>"
 )
-
 target_link_libraries(mflow_static PRIVATE ${Jsoncpp_LIBS})
-
-install(TARGETS mflow_shared mflow_static
-    LIBRARY DESTINATION lib      
-    ARCHIVE DESTINATION lib      
-)
-
 
 install(DIRECTORY ${INCLUDE_DIR}/
     DESTINATION include
