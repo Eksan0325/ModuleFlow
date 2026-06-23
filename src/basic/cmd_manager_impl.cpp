@@ -112,7 +112,7 @@ CommandObject* copy(const std::string& name, const CommandObject::CommandResultH
 	if (_cmdobj != nullptr) _cmdobj->setResultHandler(handler);
 	return _cmdobj;
 }
-bool registerCommand(Module* context, const std::string& key, CommandObject* c, bool delete_if_failed) {
+bool registerCommandObject(Module* context, const std::string& key, CommandObject* c, bool delete_if_failed) {
 	if (context == nullptr || c == nullptr) return false;
 	if (mgr().add(c, delete_if_failed) == nullptr) return false;
 	//context

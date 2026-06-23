@@ -134,7 +134,7 @@ namespace command {
 ObjectManager& mgr();
 CommandObject* copy(const std::string& name);
 CommandObject* copy(const std::string& name, const CommandObject::CommandResultHandler& handler);
-bool registerCommand(Module* context, const std::string& key, CommandObject* c, bool delete_if_failed = false);
+bool registerCommandObject(Module* context, const std::string& key, CommandObject* c, bool delete_if_failed = false);
 }
 
 }
