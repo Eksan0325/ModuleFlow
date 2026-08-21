@@ -6,7 +6,7 @@
 #ifndef MFLOW_BASIC_DATA_MANAGER_DEF_H
 #define MFLOW_BASIC_DATA_MANAGER_DEF_H
 
-#include <json/json.h>
+#include <jsoncpp/json.h>
 
 #include "basic/base.h"
 #include "basic/object.h"
