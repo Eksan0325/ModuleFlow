@@ -1,7 +1,4 @@
 /**
- * Information in this file is the intellectual property of Rokae Technology Co., Ltd,
- * And may contains trade secrets that must be stored and viewed confidentially.
- *
  * @file loop_manager_def.h
  * @brief global loop manager
  * @author Eksan
@@ -34,7 +31,7 @@ public:
 	virtual void setPeriodTask(const std::function<void()>& func, double period_ms = 2.0) {}
 };
 
-enum LoopEventType { LOOP_EVPP, LOOP_POOL, LOOP_ASIO };
+enum LoopEventType { LOOP_EVPP, LOOP_POOL };
 
 namespace loop {
 ObjectManager& mgr();
