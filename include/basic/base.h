@@ -24,26 +24,11 @@
 #include <ostream>
 #include <cstdlib>
 
-#define MFLOW_PRIVATE_DECLARE(type, name) \
-	private: \
-		type name; \
-	public: \
-		const type& get_##name() const { return name; } \
-		void set_##name(const type& value) { name = value; }
-#define MFLOW_PRIVATE_DECLARE_MOVE(type, name) \
-	private: \
-		type name; \
-	public: \
-		const type& get_##name() const { return name; } \
-		void set_##name(type&& value) { name = std::move(value); }
-#define MFLOW_PROTECTED_DECLARE(type, name) \
-	protected: \
-		type name; \
-	public: \
-		const type& get_##name() const { return name; } \
-		void set_##name(const type& value) { name = value; }
 
-#define MFLOW_PIMPL_POINTER_DECLARE protected: class PrivateImpl; PrivateImpl* pimpl_;
+#define MFLOW_PIMPL_POINTER_DECLARE \
+protected: \
+class PrivateImpl; PrivateImpl* pimpl_;
+
 #define MFLOW_INHERIT_CONSTRUCTORS_IMPL(CONSTRUCTOR, CLASS, ...) \
 public: \
 using __VA_ARGS__::CONSTRUCTOR; \
@@ -53,7 +38,6 @@ CLASS(__VA_ARGS__&& other) noexcept : __VA_ARGS__(std::move(other)) {}
 
 namespace mflow {
 namespace meta {
-
 /*
 * @note enable_if_t and enable_if_void for C++14, and _void_t for SFINAE, and this project based on C++11, so we need to define them by ourselves.
 * @see https://en.cppreference.com/w/cpp/types/enable_if
@@ -65,7 +49,8 @@ using enable_if_void = typename std::enable_if<B, void>::type;
 template<typename ...>
 using _void_t = void;
 /*
-* @note is_comparable for SFINAE, to check if the type can be compared by operator==, and this project based on C++11, so we need to define it by ourselves.
+* @note is_comparable for SFINAE, to check if the type can be compared by operator==, 
+* and this project based on C++11, so we need to define it by ourselves.
 */
 template<typename L, typename R, typename = void>
 struct is_comparable : std::false_type {};
@@ -74,7 +59,8 @@ using _t_comparability = decltype(std::declval<L>() == std::declval<R>());
 template<typename L, typename R>
 struct is_comparable<L, R, _void_t<_t_comparability<L, R>>> : std::true_type {};
 /*
-* @note equals for SFINAE, to check if the type can be compared by operator==, and this project based on C++11, so we need to define it by ourselves.
+* @note equals for SFINAE, to check if the type can be compared by operator==, 
+* and this project based on C++11, so we need to define it by ourselves.
 */
 template<typename T> inline static typename std::enable_if<is_comparable<T, T>::value, bool>::type 
 equals(const T& t1, const T& t2) { return t1 == t2; }
@@ -186,7 +172,7 @@ public:
 	MutexData(Type&& D) : data_(std::move(D)) {}
 	MutexData(const MutexData& other) { Lock _(mtx_); data_ = other.data_; }
 
-	inline Type MutexDataLoad() const { Lock _(mtx_); return data_; }
+	inline Type MutexDataLoad() { Lock _(mtx_); return data_; }
 	inline void MutexDataStore(const Type& D) { Lock _(mtx_); data_ = (D); }
 
 private:
@@ -194,6 +180,7 @@ private:
 	std::mutex mtx_;
 };
 }
+
 namespace container {
 template<typename DerivedT, typename ValueT>
 class PrivateTContainerBase {
@@ -295,14 +282,17 @@ class HashMap : public std::unordered_map<K, V>, public PrivateKVContainerBase<H
 
 #define MFLOW_CONTAINER_T_OUTSTREAM_DECL(CONTAINER) \
 template<typename T> std::ostream& operator<<(std::ostream& os, const CONTAINER<T>& container)
+
 #define MFLOW_CONTAINER_KV_OUTSTREAM_DECL(CONTAINER) \
 template<typename K, typename V> std::ostream& operator<<(std::ostream& os, const CONTAINER<K, V>& container)
+
 #define MFLOW_CONTAINER_OUTSTREAM_IMPL(BEGIN, END, ...) \
 os << BEGIN; \
 size_t _cnt = 0; \
 for (const auto& _iterator : container) { os << __VA_ARGS__; if (++_cnt != container.size()) os << ", "; } \
 os << END; \
 return os;
+
 MFLOW_CONTAINER_T_OUTSTREAM_DECL(mflow::container::Vector) { MFLOW_CONTAINER_OUTSTREAM_IMPL("[", "]", _iterator); }
 MFLOW_CONTAINER_T_OUTSTREAM_DECL(mflow::container::List) { MFLOW_CONTAINER_OUTSTREAM_IMPL("[", "]", _iterator); }
 MFLOW_CONTAINER_KV_OUTSTREAM_DECL(mflow::container::Map) { MFLOW_CONTAINER_OUTSTREAM_IMPL("{", "}", _iterator.first << ": " << _iterator.second); }
