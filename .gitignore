@@ -9,6 +9,9 @@
 *.o
 *.obj
 
+#clangd language server
+.clangd
+
 # Precompiled Headers
 *.gch
 *.pch
