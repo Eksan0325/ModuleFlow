@@ -1,3 +1,5 @@
+# Visual Studio
+.vs
 # Prerequisites
 *.d
 
@@ -6,6 +8,9 @@
 *.lo
 *.o
 *.obj
+
+#clangd language server
+.clangd
 
 # Precompiled Headers
 *.gch
@@ -47,6 +52,7 @@ build-*/
 # CMake generated files
 CMakeFiles/
 CMakeCache.txt
+CMakeSettings.json
 cmake_install.cmake
 Makefile
 install_manifest.txt
